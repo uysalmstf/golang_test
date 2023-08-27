@@ -12,6 +12,8 @@ func Routes(route *gin.Engine) {
 	{
 
 		product.GET("list", Controllers.ListProducts)
+		product.POST("save", Controllers.SaveProduct)
+
 	}
 
 }
