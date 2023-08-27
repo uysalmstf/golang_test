@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"one_test_case/DBConfig"
-	ProductRoutes "one_test_case/Routes"
+	routes "one_test_case/Routes"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -28,7 +28,8 @@ func main() {
 
 	router := gin.Default()
 
-	ProductRoutes.Routes(router)
+	routes.ProductRoutes(router)
+	routes.CampaignRoutes(router)
 
 	router.Run(":9000")
 }
