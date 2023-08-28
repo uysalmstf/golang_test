@@ -10,6 +10,8 @@ type Campaign struct {
 	Status                 int32   `json:"status"`
 	CreatedDate            string  `json:"created_date"`
 	PriceNow               float32 `json:"price_now"`
+	PriceDuration          int32   `json:"price_duration"`
+	LastUpdateDate         string  `json:"last_update_date"`
 }
 
 func (c *Campaign) TableName() string {

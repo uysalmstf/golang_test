@@ -22,3 +22,10 @@ func GetProductByCode(product *Product, code string) (err error) {
 	}
 	return nil
 }
+
+func GetProductById(product *Product, id int32) (err error) {
+	if err = DBConfig.DB.Where("id = ?", id).First(product).Error; err != nil {
+		return err
+	}
+	return nil
+}
