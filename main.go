@@ -4,6 +4,7 @@ import (
 	"log"
 	"one_test_case/DBConfig"
 	routes "one_test_case/Routes"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -31,5 +32,5 @@ func main() {
 	routes.ProductRoutes(router)
 	routes.CampaignRoutes(router)
 
-	router.Run(":9000")
+	router.Run(os.Getenv("RUN_PORT"))
 }
