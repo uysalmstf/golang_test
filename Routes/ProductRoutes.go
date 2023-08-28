@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Routes(route *gin.Engine) {
+func ProductRoutes(route *gin.Engine) {
 
 	product := route.Group("/product")
 	{
