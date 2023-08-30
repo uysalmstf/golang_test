@@ -101,6 +101,11 @@ func SaveCampaign(c *gin.Context) {
 
 		randDuration := generateRandomInt(1, int(campaign.Duration))
 
+		if product.Stock < campaign.TargetSalesCount {
+			Helpers.RespError(c, "Ürün sayısı, stok sayısını geçemez")
+			return
+		}
+
 		campaign.PriceDuration = int32(randDuration)
 
 		campaign.LastUpdateDate = campaign.CreatedDate
