@@ -162,7 +162,7 @@ func IncreaseTime(c *gin.Context) {
 		}
 
 		newUpTime := lastUpdateParsedTime.Add(time.Duration(campaigns[i].PriceDuration) * time.Hour)
-		if curParsedTime.After(newUpTime) {
+		if curParsedTime.Before(newUpTime) {
 
 			//todo: price update
 			campaigns[i].PriceNow = calcPrice(campaigns[i])
