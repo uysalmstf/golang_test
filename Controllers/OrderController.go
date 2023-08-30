@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"one_test_case/Models"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,8 +40,10 @@ func SaveOrder(c *gin.Context) {
 		}
 		order.ProductId = int32(product.Id)
 		order.Quantity = requestBody.Quantity
+		order.CreatedDate = time.Now().Format("2006-01-02 15:04:05")
 		if product.Stock < order.Quantity {
-			c.JSON(http.StatusNotFound, "Stoktaki üründen fazlası girilmiş")
+			fmt.Println("stoktaki üründen fazlası girilmiş")
+			c.AbortWithStatus(http.StatusNotFound)
 		}
 		err := Models.CreateOrder(&order)
 		if err != nil {
