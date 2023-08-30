@@ -31,6 +31,7 @@ func main() {
 
 	routes.ProductRoutes(router)
 	routes.CampaignRoutes(router)
+	routes.OrderRoutes(router)
 
 	router.Run(os.Getenv("RUN_PORT"))
 }
