@@ -28,7 +28,6 @@ func main() {
 	defer DBConfig.DB.Close()
 
 	router := gin.Default()
-
 	routes.ProductRoutes(router)
 	routes.CampaignRoutes(router)
 	routes.OrderRoutes(router)

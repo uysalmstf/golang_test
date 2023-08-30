@@ -20,6 +20,7 @@ func ListCampaigns(c *gin.Context) {
 	err := Models.GetAllCampaigns(&campaigns)
 	if err != nil {
 		Helpers.RespError(c, err.Error())
+		return
 	} else {
 
 		for i := 0; i < len(campaigns); i++ {
@@ -27,10 +28,12 @@ func ListCampaigns(c *gin.Context) {
 			parsedTime, err := time.Parse(layout, campaigns[i].CreatedDate)
 			if err != nil {
 				Helpers.RespError(c, err.Error())
+				return
 			}
 			curParsedTime, curErr := time.Parse(layout, time.Now().Format("2006-01-02 15:04:05"))
 			if curErr != nil {
 				Helpers.RespError(c, curErr.Error())
+				return
 			}
 
 			end_date := parsedTime.Add(time.Duration(campaigns[i].Duration) * time.Hour)
@@ -78,11 +81,13 @@ func SaveCampaign(c *gin.Context) {
 
 	if err := c.BindJSON(&requestBody); err != nil {
 		Helpers.RespError(c, err.Error())
+		return
 	} else {
 
 		err := Models.GetProductByCode(&product, requestBody.Code)
 		if err != nil {
 			Helpers.RespError(c, err.Error())
+			return
 		}
 
 		campaign.Duration = requestBody.Duration
@@ -103,6 +108,7 @@ func SaveCampaign(c *gin.Context) {
 		insertErr := Models.CreateCampaign(&campaign)
 		if insertErr != nil {
 			Helpers.RespError(c, insertErr.Error())
+			return
 		} else {
 			Helpers.RespOK(c, "İşlem Başarılı")
 		}
@@ -115,11 +121,13 @@ func GetCampaign(c *gin.Context) {
 
 	if err := c.BindJSON(&requestBody); err != nil {
 		Helpers.RespError(c, err.Error())
+		return
 	} else {
 
 		err := Models.GetCampaignByName(&campaign, requestBody.Name)
 		if err != nil {
 			Helpers.RespError(c, err.Error())
+			return
 		}
 
 		Helpers.RespOK(c, campaign)

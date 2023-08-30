@@ -14,6 +14,7 @@ func ListProducts(c *gin.Context) {
 	if err != nil {
 
 		Helpers.RespError(c, err.Error())
+		return
 	} else {
 
 		Helpers.RespOK(c, products)
@@ -27,6 +28,7 @@ func SaveProduct(c *gin.Context) {
 	if err := c.BindJSON(&requestBody); err != nil {
 
 		Helpers.RespError(c, err.Error())
+		return
 	} else {
 
 		c.BindJSON(&product)
@@ -34,13 +36,11 @@ func SaveProduct(c *gin.Context) {
 		product.Code = requestBody.Code
 
 		var sameProduct Models.Product
-		sameErr := Models.GetProductByCode(&sameProduct, product.Code)
-		if sameErr != nil {
-			Helpers.RespError(c, sameErr.Error())
-		}
+		_ = Models.GetProductByCode(&sameProduct, product.Code)
 
 		if sameProduct.Code != "" {
 			Helpers.RespError(c, "Aynı kodda ürün mevcut.")
+			return
 		}
 
 		product.Stock = requestBody.Stock
@@ -50,6 +50,7 @@ func SaveProduct(c *gin.Context) {
 		if err != nil {
 
 			Helpers.RespError(c, err.Error())
+			return
 		} else {
 
 			Helpers.RespOK(c, "İşlem Başarılı")
@@ -63,11 +64,13 @@ func GetProduct(c *gin.Context) {
 
 	if err := c.BindJSON(&requestBody); err != nil {
 		Helpers.RespError(c, err.Error())
+		return
 	} else {
 
 		err := Models.GetProductByCode(&product, requestBody.Code)
 		if err != nil {
 			Helpers.RespError(c, err.Error())
+			return
 		}
 
 		Helpers.RespOK(c, product)

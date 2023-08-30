@@ -12,9 +12,13 @@ func RespOK(c *gin.Context, data any) {
 		"message": "İşlem Başarılı",
 		"data":    data,
 	})
+
+	return
 }
 
 func RespError(c *gin.Context, msg string) {
 
-	c.AbortWithStatusJSON(http.StatusOK, msg)
+	c.JSON(http.StatusOK, msg)
+
+	return
 }
