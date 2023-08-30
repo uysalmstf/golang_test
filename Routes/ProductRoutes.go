@@ -13,6 +13,7 @@ func ProductRoutes(route *gin.Engine) {
 
 		product.GET("list", Controllers.ListProducts)
 		product.POST("save", Controllers.SaveProduct)
+		product.POST("get", Controllers.GetProduct)
 
 	}
 
