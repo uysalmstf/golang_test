@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"one_test_case/Helpers"
 	"one_test_case/Models"
 	"time"
 
@@ -18,23 +19,18 @@ func ListCampaigns(c *gin.Context) {
 
 	err := Models.GetAllCampaigns(&campaigns)
 	if err != nil {
-		fmt.Println(err.Error())
-		c.AbortWithStatus(http.StatusNotFound)
+		Helpers.RespError(c, err.Error())
 	} else {
 
 		for i := 0; i < len(campaigns); i++ {
 
 			parsedTime, err := time.Parse(layout, campaigns[i].CreatedDate)
 			if err != nil {
-				fmt.Println("Error:", err)
-				c.JSON(http.StatusBadRequest, err.Error())
-				continue
+				Helpers.RespError(c, err.Error())
 			}
 			curParsedTime, curErr := time.Parse(layout, time.Now().Format("2006-01-02 15:04:05"))
 			if curErr != nil {
-				fmt.Println("Error:", curErr)
-				c.JSON(http.StatusBadRequest, curErr.Error())
-				continue
+				Helpers.RespError(c, curErr.Error())
 			}
 
 			end_date := parsedTime.Add(time.Duration(campaigns[i].Duration) * time.Hour)
@@ -44,17 +40,14 @@ func ListCampaigns(c *gin.Context) {
 
 				upErr := Models.UpdateCampaign(&campaigns[i])
 				if upErr != nil {
-					fmt.Println("Error:", upErr)
-					c.JSON(http.StatusBadRequest, upErr.Error())
+					Helpers.RespError(c, upErr.Error())
 				}
 				continue
 			}
 
 			lastUpdateParsedTime, err := time.Parse(layout, campaigns[i].LastUpdateDate)
 			if err != nil {
-				fmt.Println("Error:", err)
-				c.JSON(http.StatusBadRequest, err.Error())
-				continue
+				Helpers.RespError(c, err.Error())
 			}
 
 			lastTime := lastUpdateParsedTime.Add(time.Duration(campaigns[i].PriceDuration) * time.Hour)
@@ -66,15 +59,14 @@ func ListCampaigns(c *gin.Context) {
 				campaigns[i].LastUpdateDate = time.Now().Format("2006-01-02 15:04:05")
 				upErr := Models.UpdateCampaign(&campaigns[i])
 				if upErr != nil {
-					fmt.Println("Error:", upErr)
-					c.JSON(http.StatusBadRequest, upErr.Error())
+					Helpers.RespError(c, upErr.Error())
 				}
 			}
 
 			newCampaignsArr = append(newCampaignsArr, campaigns[i])
 
 		}
-		c.JSON(http.StatusOK, newCampaignsArr)
+		Helpers.RespOK(c, newCampaignsArr)
 	}
 }
 
@@ -85,12 +77,12 @@ func SaveCampaign(c *gin.Context) {
 	var requestBody Models.CampaignSaveReqBody
 
 	if err := c.BindJSON(&requestBody); err != nil {
-		c.JSON(http.StatusNotFound, err.Error())
+		Helpers.RespError(c, err.Error())
 	} else {
 
 		err := Models.GetProductByCode(&product, requestBody.Code)
 		if err != nil {
-			c.JSON(http.StatusNotFound, err.Error())
+			Helpers.RespError(c, err.Error())
 		}
 
 		campaign.Duration = requestBody.Duration
@@ -110,15 +102,71 @@ func SaveCampaign(c *gin.Context) {
 
 		insertErr := Models.CreateCampaign(&campaign)
 		if insertErr != nil {
-			fmt.Println(insertErr.Error())
-			c.AbortWithStatus(http.StatusNotFound)
+			Helpers.RespError(c, insertErr.Error())
 		} else {
-			c.JSON(http.StatusOK, gin.H{
-				"status":  true,
-				"message": "İşlem Başarılı",
-			})
+			Helpers.RespOK(c, "İşlem Başarılı")
 		}
 	}
+}
+
+func GetCampaign(c *gin.Context) {
+	var campaign Models.Campaign
+	var requestBody Models.GetCampaignReqBody
+
+	if err := c.BindJSON(&requestBody); err != nil {
+		Helpers.RespError(c, err.Error())
+	} else {
+
+		err := Models.GetCampaignByName(&campaign, requestBody.Name)
+		if err != nil {
+			Helpers.RespError(c, err.Error())
+		}
+
+		Helpers.RespOK(c, campaign)
+
+	}
+}
+
+func IncreaseTime(c *gin.Context) {
+
+	var requestBody Models.CampaignInctimeReqBody
+
+	var campaigns []Models.Campaign
+	err := Models.GetAllCampaigns(&campaigns)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.AbortWithStatus(http.StatusNotFound)
+	}
+
+	layout := "2006-01-02 15:04:05"
+
+	curTime := time.Now().Add(time.Duration(requestBody.Duration) * time.Hour).Format("2006-01-02 15:04:05")
+	curParsedTime, curErr := time.Parse(layout, curTime)
+	if curErr != nil {
+		Helpers.RespError(c, curErr.Error())
+	}
+
+	for i := 0; i < len(campaigns); i++ {
+
+		lastUpdateParsedTime, err := time.Parse(layout, campaigns[i].LastUpdateDate)
+		if err != nil {
+			Helpers.RespError(c, err.Error())
+		}
+
+		newUpTime := lastUpdateParsedTime.Add(time.Duration(campaigns[i].PriceDuration) * time.Hour)
+		if curParsedTime.After(newUpTime) {
+
+			//todo: price update
+			campaigns[i].PriceNow = calcPrice(campaigns[i])
+			campaigns[i].LastUpdateDate = time.Now().Format("2006-01-02 15:04:05")
+			upErr := Models.UpdateCampaign(&campaigns[i])
+			if upErr != nil {
+				Helpers.RespError(c, upErr.Error())
+			}
+		}
+
+	}
+	Helpers.RespOK(c, "İşlem Başarılı.")
 }
 
 func calcPrice(campaign Models.Campaign) float32 {

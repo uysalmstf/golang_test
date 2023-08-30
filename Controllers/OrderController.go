@@ -1,8 +1,7 @@
 package Controllers
 
 import (
-	"fmt"
-	"net/http"
+	"one_test_case/Helpers"
 	"one_test_case/Models"
 	"time"
 
@@ -15,10 +14,10 @@ func ListOrder(c *gin.Context) {
 	err := Models.GetAllOrders(&orders)
 	if err != nil {
 
-		c.AbortWithStatus(http.StatusNotFound)
+		Helpers.RespError(c, err.Error())
 	} else {
 
-		c.JSON(http.StatusOK, orders)
+		Helpers.RespOK(c, orders)
 	}
 }
 
@@ -28,7 +27,7 @@ func SaveOrder(c *gin.Context) {
 
 	if err := c.BindJSON(&requestBody); err != nil {
 
-		c.JSON(http.StatusNotFound, err.Error())
+		Helpers.RespError(c, err.Error())
 	} else {
 
 		c.BindJSON(&order)
@@ -36,26 +35,21 @@ func SaveOrder(c *gin.Context) {
 		var product Models.Product
 		err = Models.GetProductByCode(&product, requestBody.Code)
 		if err != nil {
-			c.JSON(http.StatusNotFound, err.Error())
+			Helpers.RespError(c, err.Error())
 		}
 		order.ProductId = int32(product.Id)
 		order.Quantity = requestBody.Quantity
 		order.CreatedDate = time.Now().Format("2006-01-02 15:04:05")
 		if product.Stock < order.Quantity {
-			fmt.Println("stoktaki üründen fazlası girilmiş")
-			c.AbortWithStatus(http.StatusNotFound)
+			Helpers.RespError(c, "Stoktaki üründen fazlası girilmiş.")
 		}
 		err := Models.CreateOrder(&order)
 		if err != nil {
 
-			fmt.Println(err.Error())
-			c.AbortWithStatus(http.StatusNotFound)
+			Helpers.RespError(c, err.Error())
 		} else {
 
-			c.JSON(http.StatusOK, gin.H{
-				"status":  true,
-				"message": "İşlem Başarılı",
-			})
+			Helpers.RespOK(c, "İşlem Başarılı")
 		}
 	}
 }
@@ -66,15 +60,15 @@ func GetOrder(c *gin.Context) {
 	var requestBody Models.GetReqBody
 
 	if err := c.BindJSON(&requestBody); err != nil {
-		c.JSON(http.StatusNotFound, err.Error())
+		Helpers.RespError(c, err.Error())
 	} else {
 
 		err := Models.GetOrderById(&order, requestBody.Id)
 		if err != nil {
-			c.JSON(http.StatusNotFound, err.Error())
+			Helpers.RespError(c, err.Error())
 		}
 
-		c.JSON(http.StatusOK, order)
+		Helpers.RespOK(c, order)
 
 	}
 }
