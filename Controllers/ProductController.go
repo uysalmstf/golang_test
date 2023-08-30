@@ -33,6 +33,17 @@ func SaveProduct(c *gin.Context) {
 		c.BindJSON(&product)
 		product.Name = requestBody.Name
 		product.Code = requestBody.Code
+
+		var sameProduct Models.Product
+		sameErr := Models.GetProductByCode(&sameProduct, product.Code)
+		if sameErr != nil {
+			c.AbortWithError(http.StatusBadRequest, sameErr)
+		}
+
+		if sameProduct.Code != "" {
+			c.AbortWithStatusJSON(http.StatusNotFound, "Aynı kodda ürün var")
+		}
+
 		product.Stock = requestBody.Stock
 		product.Price = requestBody.Price
 
