@@ -24,7 +24,9 @@ func ListProducts(c *gin.Context) {
 func SaveProduct(c *gin.Context) {
 	var product Models.Product
 	var requestBody Models.ProductSaveReqBody
+
 	if err := c.BindJSON(&requestBody); err != nil {
+
 		c.JSON(http.StatusNotFound, err.Error())
 	} else {
 
@@ -33,11 +35,14 @@ func SaveProduct(c *gin.Context) {
 		product.Code = requestBody.Code
 		product.Stock = requestBody.Stock
 		product.Price = requestBody.Price
+
 		err := Models.CreateProduct(&product)
 		if err != nil {
+
 			fmt.Println(err.Error())
 			c.AbortWithStatus(http.StatusNotFound)
 		} else {
+
 			c.JSON(http.StatusOK, gin.H{
 				"status":  true,
 				"message": "İşlem Başarılı",

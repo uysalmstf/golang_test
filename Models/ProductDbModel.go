@@ -15,3 +15,17 @@ func CreateProduct(product *Product) (err error) {
 	}
 	return nil
 }
+
+func GetProductByCode(product *Product, code string) (err error) {
+	if err = DBConfig.DB.Where("code = ?", code).First(product).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetProductById(product *Product, id int32) (err error) {
+	if err = DBConfig.DB.Where("id = ?", id).First(product).Error; err != nil {
+		return err
+	}
+	return nil
+}
