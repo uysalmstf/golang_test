@@ -1,8 +1,7 @@
 package Controllers
 
 import (
-	"fmt"
-	"net/http"
+	"one_test_case/Helpers"
 	"one_test_case/Models"
 
 	"github.com/gin-gonic/gin"
@@ -14,10 +13,10 @@ func ListProducts(c *gin.Context) {
 	err := Models.GetAllProducts(&products)
 	if err != nil {
 
-		c.AbortWithStatus(http.StatusNotFound)
+		Helpers.RespError(c, err.Error())
 	} else {
 
-		c.JSON(http.StatusOK, products)
+		Helpers.RespOK(c, products)
 	}
 }
 
@@ -27,7 +26,7 @@ func SaveProduct(c *gin.Context) {
 
 	if err := c.BindJSON(&requestBody); err != nil {
 
-		c.JSON(http.StatusNotFound, err.Error())
+		Helpers.RespError(c, err.Error())
 	} else {
 
 		c.BindJSON(&product)
@@ -37,11 +36,11 @@ func SaveProduct(c *gin.Context) {
 		var sameProduct Models.Product
 		sameErr := Models.GetProductByCode(&sameProduct, product.Code)
 		if sameErr != nil {
-			c.AbortWithError(http.StatusBadRequest, sameErr)
+			Helpers.RespError(c, sameErr.Error())
 		}
 
 		if sameProduct.Code != "" {
-			c.AbortWithStatusJSON(http.StatusNotFound, "Aynı kodda ürün var")
+			Helpers.RespError(c, "Aynı kodda ürün mevcut.")
 		}
 
 		product.Stock = requestBody.Stock
@@ -50,14 +49,10 @@ func SaveProduct(c *gin.Context) {
 		err := Models.CreateProduct(&product)
 		if err != nil {
 
-			fmt.Println(err.Error())
-			c.AbortWithStatus(http.StatusNotFound)
+			Helpers.RespError(c, err.Error())
 		} else {
 
-			c.JSON(http.StatusOK, gin.H{
-				"status":  true,
-				"message": "İşlem Başarılı",
-			})
+			Helpers.RespOK(c, "İşlem Başarılı")
 		}
 	}
 }
@@ -67,15 +62,15 @@ func GetProduct(c *gin.Context) {
 	var requestBody Models.GetProductReqBody
 
 	if err := c.BindJSON(&requestBody); err != nil {
-		c.JSON(http.StatusNotFound, err.Error())
+		Helpers.RespError(c, err.Error())
 	} else {
 
 		err := Models.GetProductByCode(&product, requestBody.Code)
 		if err != nil {
-			c.JSON(http.StatusNotFound, err.Error())
+			Helpers.RespError(c, err.Error())
 		}
 
-		c.JSON(http.StatusOK, product)
+		Helpers.RespOK(c, product)
 
 	}
 }
