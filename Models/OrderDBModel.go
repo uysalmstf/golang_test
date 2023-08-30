@@ -15,3 +15,10 @@ func CreateOrder(order *Order) (err error) {
 	}
 	return nil
 }
+
+func GetOrderById(order *Order, id int32) (err error) {
+	if err = DBConfig.DB.Where("id = ?", id).First(order).Error; err != nil {
+		return err
+	}
+	return nil
+}

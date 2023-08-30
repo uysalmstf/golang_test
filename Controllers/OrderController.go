@@ -59,4 +59,19 @@ func SaveOrder(c *gin.Context) {
 
 func GetOrder(c *gin.Context) {
 
+	var order Models.Order
+	var requestBody Models.GetReqBody
+
+	if err := c.BindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusNotFound, err.Error())
+	} else {
+
+		err := Models.GetOrderById(&order, requestBody.Id)
+		if err != nil {
+			c.JSON(http.StatusNotFound, err.Error())
+		}
+
+		c.JSON(http.StatusOK, order)
+
+	}
 }
