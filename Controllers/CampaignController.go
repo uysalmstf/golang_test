@@ -121,6 +121,24 @@ func SaveCampaign(c *gin.Context) {
 	}
 }
 
+func GetCampaign(c *gin.Context) {
+	var campaign Models.Campaign
+	var requestBody Models.GetCampaignReqBody
+
+	if err := c.BindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusNotFound, err.Error())
+	} else {
+
+		err := Models.GetCampaignByName(&campaign, requestBody.Name)
+		if err != nil {
+			c.JSON(http.StatusNotFound, err.Error())
+		}
+
+		c.JSON(http.StatusOK, campaign)
+
+	}
+}
+
 func calcPrice(campaign Models.Campaign) float32 {
 
 	min := campaign.PriceNow - (campaign.PriceNow * float32(campaign.PriceManipulationLimit) / 100)

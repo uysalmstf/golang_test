@@ -50,3 +50,7 @@ func SaveProduct(c *gin.Context) {
 		}
 	}
 }
+
+func GetProduct(c *gin.Context) {
+
+}

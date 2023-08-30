@@ -13,6 +13,7 @@ func CampaignRoutes(route *gin.Engine) {
 
 		campaign.GET("list", Controllers.ListCampaigns)
 		campaign.POST("save", Controllers.SaveCampaign)
+		campaign.POST("get", Controllers.GetCampaign)
 
 	}
 

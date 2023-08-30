@@ -22,3 +22,17 @@ func UpdateCampaign(campaign *Campaign) (err error) {
 	}
 	return nil
 }
+
+func GetCampaignById(campaign *Campaign, id int32) (err error) {
+	if err = DBConfig.DB.Where("id = ?", id).First(campaign).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetCampaignByName(campaign *Campaign, name string) (err error) {
+	if err = DBConfig.DB.Where("name = ?", name).First(campaign).Error; err != nil {
+		return err
+	}
+	return nil
+}
