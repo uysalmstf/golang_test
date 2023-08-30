@@ -48,7 +48,7 @@ func ListCampaigns(c *gin.Context) {
 				continue
 			}
 
-			lastUpdateParsedTime, err := time.Parse(layout, campaigns[i].LastUpdateDate)
+			/*lastUpdateParsedTime, err := time.Parse(layout, campaigns[i].LastUpdateDate)
 			if err != nil {
 				Helpers.RespError(c, err.Error())
 			}
@@ -64,7 +64,7 @@ func ListCampaigns(c *gin.Context) {
 				if upErr != nil {
 					Helpers.RespError(c, upErr.Error())
 				}
-			}
+			}*/
 
 			newCampaignsArr = append(newCampaignsArr, campaigns[i])
 
@@ -143,6 +143,10 @@ func GetCampaign(c *gin.Context) {
 func IncreaseTime(c *gin.Context) {
 
 	var requestBody Models.CampaignInctimeReqBody
+	if err := c.BindJSON(&requestBody); err != nil {
+		Helpers.RespError(c, err.Error())
+		return
+	}
 
 	var campaigns []Models.Campaign
 	err := Models.GetAllCampaigns(&campaigns)
@@ -153,7 +157,9 @@ func IncreaseTime(c *gin.Context) {
 
 	layout := "2006-01-02 15:04:05"
 
-	curTime := time.Now().Add(time.Duration(requestBody.Duration) * time.Hour).Format("2006-01-02 15:04:05")
+	curTime := time.Now().Local().Add(time.Duration(requestBody.Duration) * time.Hour).Format("2006-01-02 15:04:05")
+	fmt.Println(curTime)
+	fmt.Println(requestBody.Duration)
 	curParsedTime, curErr := time.Parse(layout, curTime)
 	if curErr != nil {
 		Helpers.RespError(c, curErr.Error())
@@ -167,7 +173,9 @@ func IncreaseTime(c *gin.Context) {
 		}
 
 		newUpTime := lastUpdateParsedTime.Add(time.Duration(campaigns[i].PriceDuration) * time.Hour)
-		if curParsedTime.Before(newUpTime) {
+		fmt.Println(newUpTime)
+		fmt.Println(curParsedTime)
+		if curParsedTime.After(newUpTime) {
 
 			//todo: price update
 			campaigns[i].PriceNow = calcPrice(campaigns[i])
