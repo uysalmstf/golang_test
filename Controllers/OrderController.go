@@ -15,6 +15,7 @@ func ListOrder(c *gin.Context) {
 	if err != nil {
 
 		Helpers.RespError(c, err.Error())
+		return
 	} else {
 
 		Helpers.RespOK(c, orders)
@@ -28,6 +29,7 @@ func SaveOrder(c *gin.Context) {
 	if err := c.BindJSON(&requestBody); err != nil {
 
 		Helpers.RespError(c, err.Error())
+		return
 	} else {
 
 		c.BindJSON(&order)
@@ -36,17 +38,20 @@ func SaveOrder(c *gin.Context) {
 		err = Models.GetProductByCode(&product, requestBody.Code)
 		if err != nil {
 			Helpers.RespError(c, err.Error())
+			return
 		}
 		order.ProductId = int32(product.Id)
 		order.Quantity = requestBody.Quantity
 		order.CreatedDate = time.Now().Format("2006-01-02 15:04:05")
 		if product.Stock < order.Quantity {
 			Helpers.RespError(c, "Stoktaki üründen fazlası girilmiş.")
+			return
 		}
 		err := Models.CreateOrder(&order)
 		if err != nil {
 
 			Helpers.RespError(c, err.Error())
+			return
 		} else {
 
 			Helpers.RespOK(c, "İşlem Başarılı")
@@ -61,6 +66,7 @@ func GetOrder(c *gin.Context) {
 
 	if err := c.BindJSON(&requestBody); err != nil {
 		Helpers.RespError(c, err.Error())
+		return
 	} else {
 
 		err := Models.GetOrderById(&order, requestBody.Id)
