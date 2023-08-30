@@ -52,5 +52,19 @@ func SaveProduct(c *gin.Context) {
 }
 
 func GetProduct(c *gin.Context) {
+	var product Models.Product
+	var requestBody Models.GetProductReqBody
 
+	if err := c.BindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusNotFound, err.Error())
+	} else {
+
+		err := Models.GetProductByCode(&product, requestBody.Code)
+		if err != nil {
+			c.JSON(http.StatusNotFound, err.Error())
+		}
+
+		c.JSON(http.StatusOK, product)
+
+	}
 }
